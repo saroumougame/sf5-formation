@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block main %}
+    <section id="first-section" class="background-gradient text-center text-white">
+        <div class="container p-md-3">
+            <div class="row">
+                <div class="col-md-12 mx-auto m-5">
+                    <img class="m-5" src="/assets/images/sensiotv-icon.png" alt="SensioTV Brand Icon">
+                    <h2 class="display-3 font-weight-bold mb-5">Sensio<span class="color-green">TV+</span></h2>
+                    <p class="lead"><strong class="font-weight-bold">We will make you love TV again. Share with your co-workers the movies or series you have watched to inspire them!<br /> Comment or vote for movies of your co-workers...</strong></p>
+                </div>
+            </div>
+        </div>
+        <img class="img-fluid img-rounded-top" src="/assets/images/index-first-section.jpg" alt="SensioTV Demonstration Screen">
+    </section>
+
+    <section id="second-section" class="m-5">
+        <div class="container pb-5 pt-5">
+            <div class="row m-md-5 align-items-center text-center">
+                <div class="col-lg-6 p-md-5">
+                    <h3 class="font-weight-bold display-4">CINEMATIC.</h3>
+                    <p class="display-4 font-weight-bold mb-5"><span class="text-muted">On all aspects. In every way.</span></p>
+                    <p class="lead pt-5">Get inspired by the movies watched by your coworkers.</p>
+                    <a class="btn btn-outline-dark m-4" href="/register" title="Create an account and subscribe for one year">Register <i class="fas fa-plus"></i></a>
+                </div>
+                <div class="col-lg-6">
+                    <img class="img-fluid img-rounded" src="/assets/images/index-second-section.jpg" alt="SensioTV One Movie Sample">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="third-section" class="background-gradient p-5">
+        <div class="container pb-5">
+            <div class="row m-md-5 align-items-center">
+                <div class="col text-center p-md-5">
+                    <h4 class="display-3 font-weight-bold text-white mb-5">A wide selection of the newer movies.</h4>
+                </div>
+            </div>
+            <div class="row mb-3">
+                {% for movie in movies %}
+                    <div class="col-lg-4">
+                        <div class="card mb-4">
+                            <img class="img-fluid img-rounded-top" src="{{ movie.image }}" alt="Memento Sample Image">
+                            <div class="card-body">
+                                <p class="font-weight-bold">{{ movie.title }} <span class="text-muted">({{ movie.releaseDate|date('Y') }})</span> <small>- Christopher Nolan</small></p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <a href="{{ path('movie', {id: movie.id}) }}" class="btn btn-sm btn-dark" title="View in details">View</a>
+                                    <small class="text-success"><i class="fas fa-clock"></i> 113 mins</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="row">
+                <div class="col text-center m-5">
+                    <p><a href="/movie/latest" title="Click here to get more information">Watch all our latest movies <i class="far fa-arrow-alt-circle-right"></i></a></p>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
