@@ -7,14 +7,14 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-class MainController extends AbstractController
+class DefaultController extends AbstractController
 {
 
     /**
-     * @Route("/", name="index_page")
+     * @Route("/", name="home_page")
      */
-    public function index(): Response
+    public function homepage(): Response
     {
-        return $this->render('index.html.twig');
+        return $this->render('homepage.html.twig');
     }
 }
