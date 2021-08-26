@@ -2,25 +2,43 @@
 
 namespace App\Controller;
 
+use App\Entity\Movie;
 use App\Omdb\OmdbClient;
+use App\Repository\MovieRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * @Route("/movie", name="movie_")
  */
 class MovieController extends AbstractController
 {
+
+    private $omdb;
+
+    public function __construct(OmdbClient $omdb)
+    {
+        $this->omdb = $omdb;
+    }
+
+
     /**
      * @Route("/show/{id}", name="show")
      */
-    public function show(int $id = null): Response
+    public function show(Movie $id): Response
     {
+        if($this->isGranted('MOVIE_VIEW', $id)){
+            throw new AccessDeniedException('No role movie view');
+        }
+
         return $this->render('movie/show.html.twig', [
-            'controller_name' => 'MovieController',
+            'movie' => $id,
         ]);
     }
 
@@ -28,10 +46,11 @@ class MovieController extends AbstractController
     /**
      * @Route("/latest", name="latest")
      */
-    public function latest(): Response
+    public function latest(MovieRepository $movieRepository): Response
     {
+        $movies = $movieRepository->findAll();
         return $this->render('movie/latest.html.twig', [
-            'controller_name' => 'MovieController',
+            'movies' => $movies,
         ]);
     }
 
@@ -41,7 +60,7 @@ class MovieController extends AbstractController
     public function search(Request $request , HttpClientInterface $httpClient): Response
     {
 
-        $omdb = new OmdbClient($httpClient , '28c5b7b1' , 'https://www.omdbapi.com');
+        $omdb = $this->omdb;
 
 
         $keyword = $request->query->get('keyword', 'sky');
@@ -54,5 +73,30 @@ class MovieController extends AbstractController
             'moviesSearch' => $movieSearch
         ]);
     }
+
+
+    /**
+     * @Route("/{id}/import")
+     * @IsGranted(attributes="ROLE_USER", message="you need to connect")
+     */
+    public function import($id, Request $request, EntityManagerInterface $entityManager): Response
+    {
+
+
+        $omdb = $this->omdb;
+
+        $result = $omdb->requestById($id);
+
+        $movie = Movie::fromApi($result);
+
+        $entityManager->persist($movie);
+        $entityManager->flush();
+
+
+
+        return $this->redirectToRoute('movie_show', ['id' => $movie->getId()]);
+    }
+
+
 
 }
