@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+
 use App\Form\UserType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,6 +24,9 @@ class UserController extends AbstractController
     /**
      * UserController constructor.
      */
+
+    private $eventDispatcher;
+
     public function __construct(UserPasswordHasherInterface $userPasswordHasher)
     {
         $this->passwordHasher = $userPasswordHasher;
@@ -49,6 +53,7 @@ class UserController extends AbstractController
             $entityManager->persist($user);
             $entityManager->flush();
             dump($user);
+
         }
 
 

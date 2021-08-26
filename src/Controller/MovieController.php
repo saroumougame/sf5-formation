@@ -3,12 +3,15 @@
 namespace App\Controller;
 
 use App\Entity\Movie;
+use App\Event\MovieShowEvent;
 use App\Omdb\OmdbClient;
 use App\Repository\MovieRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -21,10 +24,12 @@ class MovieController extends AbstractController
 {
 
     private $omdb;
+    private $eventDispatcher;
 
-    public function __construct(OmdbClient $omdb)
+    public function __construct(OmdbClient $omdb, EventDispatcherInterface $eventDispatcher)
     {
         $this->omdb = $omdb;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
 
@@ -33,9 +38,11 @@ class MovieController extends AbstractController
      */
     public function show(Movie $id): Response
     {
-        if($this->isGranted('MOVIE_VIEW', $id)){
-            throw new AccessDeniedException('No role movie view');
-        }
+//        if($this->isGranted('MOVIE_VIEW', $id)){
+//            throw new AccessDeniedException('No role movie view');
+//        }
+
+        $this->eventDispatcher->dispatch(new MovieShowEvent($id), 'user_registered');
 
         return $this->render('movie/show.html.twig', [
             'movie' => $id,
